@@ -1,6 +1,6 @@
 .PHONY: all run clean
 
-OBJECTS = loader.o kmain.o
+OBJECTS = loader.o kmain.o io.o fb.o
 CC = gcc
 CFLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
          -nostartfiles -nodefaultlibs -Wall -Wextra -Werror -c
@@ -14,7 +14,10 @@ kernel.elf: $(OBJECTS)
 	ld $(LDFLAGS) $(OBJECTS) -o kernel.elf
 
 os.iso: kernel.elf
+	mkdir -p iso/boot/grub
 	cp kernel.elf iso/boot/kernel.elf
+	cp boot/grub/menu.lst iso/boot/grub/menu.lst
+	cp boot/grub/stage2_eltorito iso/boot/grub/stage2_eltorito
 	genisoimage -R                              \
                 -b boot/grub/stage2_eltorito    \
                 -no-emul-boot                   \
