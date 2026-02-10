@@ -2,7 +2,6 @@
 *.o
 *.bin
 *.elf
-*.iso
 
 # Ignorar logs e arquivos temporários
 bochslog.txt
