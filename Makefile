@@ -14,7 +14,7 @@ kernel.elf: $(OBJECTS)
 	ld $(LDFLAGS) $(OBJECTS) -o kernel.elf
 
 os.iso: kernel.elf
-    mkdir -p iso/boot/grub
+	mkdir -p iso/boot/grub
 	cp kernel.elf iso/boot/kernel.elf
 	genisoimage -R                              \
                 -b boot/grub/stage2_eltorito    \
