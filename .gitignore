@@ -1,11 +1,18 @@
-# Ignorar arquivos compilados
+# --- Arquivos Compilados ---
 *.o
 *.bin
 *.elf
+os.iso
 
-# Ignorar logs e arquivos temporários
+# --- Logs e Saídas do Emulador ---
 bochslog.txt
 *.log
+com1.out
+bochsrc.txt
 
-# Ignorar pastas de build (opcional, se você quiser manter a estrutura iso vazia, não use isso)
-# iso/
+# --- Configurações de IDE (CLion/IntelliJ) ---
+.idea/
+
+# --- Outros arquivos temporários ---
+*~
+*.swp
