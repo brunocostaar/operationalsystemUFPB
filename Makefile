@@ -1,6 +1,6 @@
 .PHONY: all run clean
 
-OBJECTS = loader.o kmain.o io.o serial.o framebuffer.o
+OBJECTS = loader.o kmain.o io.o serial.o framebuffer.o gdt.o gdt_asm.o
 CC = gcc
 CFLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
          -nostartfiles -nodefaultlibs -Wall -Wextra -Werror -c
@@ -32,7 +32,7 @@ os.iso: kernel.elf
                 iso
 
 run: os.iso
-	qemu-system-i386 -cdrom os.iso -serial stdio
+	bochs -f bochsrc.txt -q
 
 %.o: %.c
 	$(CC) $(CFLAGS) $< -o $@
