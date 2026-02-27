@@ -1,6 +1,9 @@
 .PHONY: all run clean
 
-OBJECTS = loader.o kmain.o io.o serial.o framebuffer.o gdt.o gdt_asm.o
+# Adicionados os arquivos da IDT, PIC e Interrupts
+OBJECTS = loader.o kmain.o io.o serial.o framebuffer.o gdt.o gdt_asm.o \
+          idt.o idt_asm.o pic.o interrupts.o interrupt_handlers.o
+
 CC = gcc
 CFLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
          -nostartfiles -nodefaultlibs -Wall -Wextra -Werror -c
@@ -13,9 +16,6 @@ all: kernel.elf
 kernel.elf: $(OBJECTS)
 	ld $(LDFLAGS) $(OBJECTS) -o kernel.elf
 
-serial.o: serial.c io.h
-kmain.o: kmain.c io.h
-framebuffer.o : framebuffer.c io.h
 
 os.iso: kernel.elf
 	mkdir -p iso/boot/grub
@@ -32,7 +32,7 @@ os.iso: kernel.elf
                 iso
 
 run: os.iso
-	bochs -f bochsrc.txt -q
+	qemu-system-i386 -cdrom os.iso
 
 %.o: %.c
 	$(CC) $(CFLAGS) $< -o $@
@@ -41,4 +41,4 @@ run: os.iso
 	$(AS) $(ASFLAGS) $< -o $@
 
 clean:
-	rm -rf *.o kernel.elf os.iso 
+	rm -rf *.o kernel.elf os.iso
