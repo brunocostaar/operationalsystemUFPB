@@ -1,4 +1,5 @@
 #include "io.h"
+#include "gdt.h"
 
 void kmain() {
     /* Inicializa o hardware necessário (Serial, etc) */
@@ -10,5 +11,9 @@ void kmain() {
     
     //TESTES DE TELA, ESCREVER E MOVER CURSOR
     fb_write("Bem-vindo ao OS!");    // Vai aparecer na tela azul
+    init_gdt();
+    while(1) {
+        // O SO fica rodando aqui para sempre
+    }
 
 }
