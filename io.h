@@ -60,7 +60,7 @@ int serial_is_transmit_fifo_empty(unsigned int com);
 void serial_configure_buffers(unsigned short com);
 void serial_write_byte(unsigned short com, char c);
 int serial_write(char *buf); 
-
+void serial_write_hex(unsigned int value);
 /** inb:
 *  Lê um byte de uma porta de E/S
 *

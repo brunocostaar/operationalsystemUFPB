@@ -1,21 +1,22 @@
-ENTRY(loader)                /* O nome da sua label no assembly */
+ENTRY(loader)
 
 SECTIONS {
-    . = 0x00100000;          /* O código DEVE começar em 1MB */
+    . = 0x00100000;
 
-    .text : {
-        *(.text)             /* Todo o código vai aqui */
+    .text ALIGN(4K) : {
+        *(.text)
     }
 
-    .rodata : {
-        *(.rodata)           /* Strings e constantes (Read Only Data) */
+    .rodata ALIGN(4K) : {
+        *(.rodata)
     }
 
-    .data : {
-        *(.data)             /* Variáveis globais inicializadas */
+    .data ALIGN(4K) : {
+        *(.data)
     }
 
-    .bss : {
-        *(.bss)              /* Variáveis não inicializadas e a STACK */
+    .bss ALIGN(4K) : {
+        *(COMMON)
+        *(.bss)
     }
 }

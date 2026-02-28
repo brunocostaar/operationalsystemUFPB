@@ -1,23 +1,35 @@
 .PHONY: all run clean
 
-# Adicionados os arquivos da IDT, PIC e Interrupts
-OBJECTS = loader.o kmain.o io.o serial.o framebuffer.o gdt.o gdt_asm.o \
-          idt.o idt_asm.o pic.o interrupts.o interrupt_handlers.o
+OBJECTS = loader.o pmm.o kmain.o io.o serial.o framebuffer.o gdt.o gdt_asm.o \
+          idt.o idt_asm.o pic.o interrupts.o interrupt_handlers.o paging.o paging_asm.o
 
 CC = gcc
 CFLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
-         -nostartfiles -nodefaultlibs -Wall -Wextra -Werror -c
+         -nostartfiles -nodefaultlibs -Wall -Wextra -Werror -c \
+         -fno-asynchronous-unwind-tables -fno-unwind-tables -fno-exceptions\
+         -fno-pic -fno-pie -no-pie
 LDFLAGS = -T link.ld -melf_i386
 AS = nasm
 ASFLAGS = -f elf32
 
-all: kernel.elf program
+all: os.iso
 
 kernel.elf: $(OBJECTS)
 	ld $(LDFLAGS) $(OBJECTS) -o kernel.elf
 
 
-os.iso: kernel.elf
+# =========================
+# PROGRAM (CAPÍTULO 8)
+# =========================
+program: program.s
+	mkdir -p iso/modules
+	nasm -f bin $< -o iso/modules/program
+
+
+# =========================
+# ISO
+# =========================
+os.iso: kernel.elf program
 	mkdir -p iso/boot/grub
 	cp kernel.elf iso/boot/kernel.elf
 	genisoimage -R                              \
@@ -31,12 +43,10 @@ os.iso: kernel.elf
                 -o os.iso                       \
                 iso
 
-run: program os.iso
+
+run: os.iso
 	qemu-system-i386 -cdrom os.iso
-	
-program: program.s
-	nasm -f bin $< -o $@
-	mv $@ iso/modules
+
 
 %.o: %.c
 	$(CC) $(CFLAGS) $< -o $@
@@ -44,6 +54,7 @@ program: program.s
 %.o: %.s
 	$(AS) $(ASFLAGS) $< -o $@
 
+
 clean:
 	rm -rf *.o kernel.elf os.iso
-	rm -f iso/modules/program
+	rm -rf iso/modules

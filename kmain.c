@@ -1,41 +1,77 @@
 #include "io.h"
 #include "gdt.h"
-#include "idt.h" // <-- 1. Não esqueça de incluir o header da IDT!
+#include "idt.h"
+#include "paging.h"
+#include "pmm.h"
 #include "multiboot.h"
 
 typedef void (*call_module_t)(void);
 
-void kmain(unsigned int ebx) {
-	
-	multiboot_info_t *mbinfo = (multiboot_info_t *) ebx;
-    unsigned int address_of_module = mbinfo->mods_addr;
-	
-    /* Inicializa o hardware necessário (Serial, etc) */
+void serial_write_hex(unsigned int value)
+{
+    char hex[] = "0123456789ABCDEF";
+    char out[2];
+
+    serial_write("0x");
+
+    out[1] = '\0';
+
+    for (int i = 28; i >= 0; i -= 4)
+    {
+        unsigned int digit = (value >> i) & 0xF;
+        out[0] = hex[digit];
+        serial_write(out);
+    }
+}
+
+void kmain(unsigned int eax, unsigned int ebx)
+{
+serial_write("EAX = ");
+serial_write_hex(eax);
+serial_write("\n");
+    /* Debug serial */
     serial_configure_baud_rate(0x3F8, 3);
     serial_configure_buffers(SERIAL_COM1_BASE);
-    
-    // TESTE DE LOG
-    serial_write("Log: Kernel iniciado com sucesso!\n");
-    
-    // TESTES DE TELA, ESCREVER E MOVER CURSOR
-    fb_write("Bem-vindo ao OS!");    // Vai aparecer na tela azul
-    
-    // 1. Inicializa os Segmentos de Memória
+    serial_write("Kernel iniciado\n");
+
+    fb_write("Bem-vindo ao OS!\n");
+
+    /* Inicialização básica */
     init_gdt();
-    
-    // 2. Inicializa o Tratamento de Interrupções e Remapeia o PIC
-    idt_init(); // <-- 2. Adicione a chamada da IDT aqui
-    
-    // 3. Dá o sinal verde para a CPU ouvir o teclado e os erros
-    asm volatile("sti"); // <-- 3. Adicione o comando STI aqui
-	
-	//Executando program pelo endereco guardado em ebx
-	call_module_t start_program = (call_module_t) address_of_module;
-    start_program();
-	
-    while(1) {
-        // O SO fica rodando aqui para sempre
-        // Se você apertar uma tecla, a CPU pausa o while, vai para a IDT, 
-        // executa o código do teclado e volta pro while!
+    idt_init();
+
+    /* -------- GERENCIADOR DE MEMÓRIA FÍSICA -------- */
+    pmm_init();          // ← NOVO PASSO
+
+    /* -------- PAGING -------- */
+//    paging_init(ebx);
+
+    serial_write("Paging ativo\n");
+
+    /* -------- MAPEAR MODULO DO GRUB -------- */
+    multiboot_info_t *mbinfo =
+        (multiboot_info_t*)ebx;
+
+    if (mbinfo->mods_count > 0)
+    {
+        module_t *mod =
+            (module_t*)mbinfo->mods_addr;
+
+        serial_write("Mapeando modulo...\n");
+
+
+        serial_write("Executando modulo...\n");
+
+        call_module_t start =
+            (call_module_t)mod->mod_start;
+
+        start();
     }
+    else
+    {
+        serial_write("Nenhum modulo encontrado\n");
+    }
+
+    while(1)
+        asm volatile("hlt");
 }
