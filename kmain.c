@@ -1,8 +1,15 @@
 #include "io.h"
 #include "gdt.h"
 #include "idt.h" // <-- 1. Não esqueça de incluir o header da IDT!
+#include "multiboot.h"
 
-void kmain() {
+typedef void (*call_module_t)(void);
+
+void kmain(unsigned int ebx) {
+	
+	multiboot_info_t *mbinfo = (multiboot_info_t *) ebx;
+    unsigned int address_of_module = mbinfo->mods_addr;
+	
     /* Inicializa o hardware necessário (Serial, etc) */
     serial_configure_baud_rate(0x3F8, 3);
     serial_configure_buffers(SERIAL_COM1_BASE);
@@ -21,7 +28,11 @@ void kmain() {
     
     // 3. Dá o sinal verde para a CPU ouvir o teclado e os erros
     asm volatile("sti"); // <-- 3. Adicione o comando STI aqui
-
+	
+	//Executando program pelo endereco guardado em ebx
+	call_module_t start_program = (call_module_t) address_of_module;
+    start_program();
+	
     while(1) {
         // O SO fica rodando aqui para sempre
         // Se você apertar uma tecla, a CPU pausa o while, vai para a IDT, 

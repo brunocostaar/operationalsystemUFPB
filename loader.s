@@ -1,16 +1,18 @@
 global loader                       ; Símbolo de entrada para elf
     extern kmain                    ; Declara que kmain está em outro lugar
 
-    MAGIC_NUMBER equ 0x1BADB002     ; define a constante do número mágico
-    FLAGS        equ 0x0            ; flags do multiboot
-    CHECKSUM     equ -MAGIC_NUMBER  ; calcula o checksum
+    MAGIC_NUMBER    equ 0x1BADB002     ; define a constante do número mágico
+    ALIGN_MODULES   equ 0x00000001     ; diz para o GRUB alinhar os modulos
+    ; FLAGS           equ 0x0            ; flags do multiboot
+    CHECKSUM        equ -(MAGIC_NUMBER + ALIGN_MODULES)  ; calcula o checksum
     
     KERNEL_STACK_SIZE equ 4096      ; Define a constante de 4KB para o tamanho do stack
 
     section .text                   ; início do trecho de código
     align 4                         ; código deve ter 4 bytes alinhados
         dd MAGIC_NUMBER             ; escrevo o número mágico para código de máquina,
-        dd FLAGS                    ; as flags,
+        dd ALIGN_MODULES            ; escrevo a instrução de alinhar modulos
+        ; dd FLAGS                    ; as flags,
         dd CHECKSUM                 ; e o checksum
 
     loader:                         ; a etiqueta para o loader começar a rodar o script

@@ -11,7 +11,7 @@ LDFLAGS = -T link.ld -melf_i386
 AS = nasm
 ASFLAGS = -f elf32
 
-all: kernel.elf
+all: kernel.elf program
 
 kernel.elf: $(OBJECTS)
 	ld $(LDFLAGS) $(OBJECTS) -o kernel.elf
@@ -31,8 +31,12 @@ os.iso: kernel.elf
                 -o os.iso                       \
                 iso
 
-run: os.iso
+run: program os.iso
 	qemu-system-i386 -cdrom os.iso
+	
+program: program.s
+	nasm -f bin $< -o $@
+	mv $@ iso/modules
 
 %.o: %.c
 	$(CC) $(CFLAGS) $< -o $@
@@ -42,3 +46,4 @@ run: os.iso
 
 clean:
 	rm -rf *.o kernel.elf os.iso
+	rm -f iso/modules/program
