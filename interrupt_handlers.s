@@ -31,7 +31,7 @@ no_error_code_interrupt_handler 5  ; Bound range exceeded
 no_error_code_interrupt_handler 6  ; Invalid opcode
 no_error_code_interrupt_handler 7  ; Device not available
 error_code_interrupt_handler    8  ; Double fault (Essa a CPU passa erro!)
-
+error_code_interrupt_handler    14 ;
 ; Interrupção do Relógio (Timer - IRQ0)
 no_error_code_interrupt_handler 32
 ; Interrupção do Teclado (Hardware não manda código de erro na pilha)

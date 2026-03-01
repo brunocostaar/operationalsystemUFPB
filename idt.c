@@ -9,6 +9,7 @@ extern void interrupt_handler_1();
 extern void interrupt_handler_32(); 
 extern void interrupt_handler_33(); 
 extern void pic_remap(int offset1, int offset2); // <-- ADICIONE ISSO AQUI
+extern void interrupt_handler_14();
 
 void idt_set_gate(unsigned char num, unsigned int base, unsigned short sel, unsigned char flags) {
     idt[num].base_lo = (base & 0xFFFF);
@@ -28,6 +29,7 @@ void idt_init() {
 
     idt_set_gate(0, (unsigned int)interrupt_handler_0, 0x08, 0x8E);
     idt_set_gate(1, (unsigned int)interrupt_handler_1, 0x08, 0x8E);
+idt_set_gate(14, (unsigned int)interrupt_handler_14, 0x08, 0x8E);
     idt_set_gate(32, (unsigned int)interrupt_handler_32, 0x08, 0x8E);
     idt_set_gate(33, (unsigned int)interrupt_handler_33, 0x08, 0x8E);
 

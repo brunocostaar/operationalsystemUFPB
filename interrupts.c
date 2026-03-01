@@ -37,6 +37,32 @@ const char kbd_US[128] = {
 
 // A função mágica que o Assembly chama!
 void interrupt_handler(struct cpu_state cpu) {
+if (cpu.interrupt_number == 14)
+{
+    unsigned int fault_addr;
+
+    asm volatile("mov %%cr2, %0" : "=r"(fault_addr));
+
+    volatile unsigned short *video =
+        (unsigned short*)0xB8000;
+
+    video[0] = 0x4F50; // P
+    video[1] = 0x4F46; // F
+
+    /* mostra primeiros dígitos do endereço */
+    char hex[] = "0123456789ABCDEF";
+
+    for (int i = 0; i < 8; i++) {
+        unsigned int nibble =
+            (fault_addr >> (28 - i*4)) & 0xF;
+
+        video[2+i] = (0x0F << 8) | hex[nibble];
+    }
+
+    while (1)
+        asm volatile("hlt");
+}
+
     // Se for a interrupção 0 (Divisão por zero)
     if (cpu.interrupt_number == 0) {
         // Aqui você usaria sua função de imprimir na tela/serial

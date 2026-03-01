@@ -26,7 +26,7 @@ loader:
     rep stosw
 
     push ebx      ; 
-    push eax;
+
 call kmain
 
 .loop:
