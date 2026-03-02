@@ -36,7 +36,7 @@ Cap 3: Bruno Costa, Jorge Alberto e Gabriel Aguiar
 <p align="center">
   <img src="print1.png" alt="Status Inicial do Kernel" width="600">
   <br>
-  <em>Figura 1: Boot via GRUB e execução da função kmain[cite: 7, 10].</em>
+  <em>Figura 1: Boot via GRUB e execução da função kmain.</em>
 </p>
 
 Imagem do SO rodando no QEMU, colocamos um fundo azul e um caractere ‘A’ para confirmar a funcionalidade do código C
@@ -141,7 +141,7 @@ Nestes capítulos, o sistema operacional dá um grande passo em direção à est
 <p align="center">
   <img src="print2.png" alt="Kernel Avançado" width="600">
   <br>
-  <em>Figura 2: Sistema com segmentação, interrupções e modo de usuário[cite: 41, 107].</em>
+  <em>Figura 2: Sistema com segmentação, interrupções e modo de usuário.</em>
 </p>
 
 **Guia para executar**
