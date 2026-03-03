@@ -44,9 +44,8 @@ os.iso: kernel.elf program
                 iso
 
 
-run: os.iso
-	qemu-system-i386 -cdrom os.iso
-
+run: program os.iso
+	qemu-system-i386 -cdrom os.iso -serial stdio
 
 %.o: %.c
 	$(CC) $(CFLAGS) $< -o $@

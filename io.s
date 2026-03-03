@@ -19,3 +19,15 @@ mov al, [esp + 8]    ; MOvo os dados para o registrador al
 mov dx, [esp + 4]    ; Movo o endereço da porta de E/S para dx
 out dx, al           ; Envio o dado do registrador al para o registrador dx
 ret                  ; retorno resultado
+
+global read_cs
+read_cs:
+    mov eax, 0
+    mov ax, cs      ; Puxa o Code Segment da CPU
+    ret
+
+global read_ds
+read_ds:
+    mov eax, 0
+    mov ax, ds      ; Puxa o Data Segment da CPU
+    ret
