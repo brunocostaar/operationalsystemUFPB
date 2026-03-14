@@ -110,15 +110,15 @@ typedef struct module
 
 /* The memory map. Be careful that the offset 0 is base_addr_low
   but no size. */
-typedef struct memory_map
-{
- unsigned long size;
- unsigned long base_addr_low;
- unsigned long base_addr_high;
- unsigned long length_low;
- unsigned long length_high;
- unsigned long type;
-} memory_map_t;
+// Estrutura do mapa de memória entregue pelo GRUB
+typedef struct multiboot_memory_map {
+    unsigned int size;
+    unsigned int base_addr_low;
+    unsigned int base_addr_high;
+    unsigned int length_low;
+    unsigned int length_high;
+    unsigned int type;
+} __attribute__((packed)) multiboot_memory_map_t;
 
 #endif /* ! ASM */
 

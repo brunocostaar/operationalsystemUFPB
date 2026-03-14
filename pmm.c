@@ -1,7 +1,9 @@
 #include "pmm.h"
+#include "multiboot.h"
 
 #define PAGE_SIZE 4096
-#define MAX_PAGES 32768   // suporta até 128MB RAM
+// Expandido para suportar até 4 GB de RAM no mundo real (1.048.576 blocos)
+#define MAX_PAGES 1048576   
 
 unsigned char memory_bitmap[MAX_PAGES / 8];
 
@@ -20,30 +22,51 @@ static inline int test_bit(int bit)
     return memory_bitmap[bit/8] & (1 << (bit%8));
 }
 
-void pmm_init()
+void pmm_init(multiboot_info_t *mbinfo, unsigned int kernel_start, unsigned int kernel_end)
 {
-    /* marca tudo como usado */
-    for(int i=0;i<MAX_PAGES/8;i++)
-        memory_bitmap[i]=0xFF;
-
-    /* libera memória após 2MB (kernel + GRUB seguro) */
-    for(unsigned int addr=0x200000;
-        addr < 128*1024*1024;
-        addr += PAGE_SIZE)
-    {
-        clear_bit(addr/PAGE_SIZE);
+    // 1.Começamos marcando a RAM inteira como OCUPADA (0xFF).
+    for(int i = 0; i < MAX_PAGES / 8; i++) {
+        memory_bitmap[i] = 0xFF;
     }
+
+    // 2. Lendo o mapa de memória da Placa-Mãe via GRUB
+    multiboot_memory_map_t *mmap = (multiboot_memory_map_t *) mbinfo->mmap_addr;
+    unsigned int mmap_end = mbinfo->mmap_addr + mbinfo->mmap_length;
+
+    while ((unsigned int) mmap < mmap_end) {
+        // Tipo 1 significa "RAM Livre e Utilizável"
+        if (mmap->type == 1) {
+            unsigned int addr = mmap->base_addr_low;
+            unsigned int length = mmap->length_low;
+            
+            // Destranca os bits específicos dessa região
+            for (unsigned int i = 0; i < length; i += PAGE_SIZE) {
+                clear_bit((addr + i) / PAGE_SIZE);
+            }
+        }
+        // Avança o ponteiro para a próxima entrada do mapa (o tamanho é dinâmico)
+        mmap = (multiboot_memory_map_t *) ((unsigned int) mmap + mmap->size + sizeof(mmap->size));
+    }
+
+    // 3. O GRUB diz que a marca de 1MB está livre, mas nosso Kernel está lá.
+    // Trancamos novamente a área exata onde o código do Kernel está hospedado.
+    for (unsigned int addr = kernel_start; addr <= kernel_end; addr += PAGE_SIZE) {
+        set_bit(addr / PAGE_SIZE);
+    }
+    
+    // 4. Tranca o endereço físico 0x0 por precaução (usado pelo hardware VGA da BIOS)
+    set_bit(0);
 }
 
 unsigned int pmm_alloc_page()
 {
-    for(int i=0;i<MAX_PAGES;i++)
+    for(int i = 0; i < MAX_PAGES; i++)
     {
         if(!test_bit(i))
         {
             set_bit(i);
-            return i*PAGE_SIZE;
+            return i * PAGE_SIZE;
         }
     }
-    return 0;
+    return 0; // Se retornar 0, significa que a RAM lotou (Kernel Panic)
 }
