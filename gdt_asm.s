@@ -19,3 +19,9 @@ load_gdt:
 
 flush_cs:
     ret                 ; Volta para o código em C
+
+global tss_flush
+tss_flush:
+    mov ax, 0x2B        ; Carrega o descritor 5 (TSS), RPL 3 -> (5*8) | 3 = 0x2B
+    ltr ax              ; Load Task Register
+    ret

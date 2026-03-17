@@ -49,3 +49,32 @@ common_interrupt_handler:
     popad               ; Restaura os registradores exatamente como estavam
     add esp, 8          ; Limpa os 8 bytes da pilha (código de erro + número da interrupção)
     iret                ; O retorno especial mágico!
+
+; ----------------------------------------------------
+; Transição para Ring 3 (User Mode)
+; ----------------------------------------------------
+global enter_user_mode
+enter_user_mode:
+    cli
+    mov ebx, [esp + 4]  ; Pega o argumento (ponteiro de função)
+    
+    mov ax, 0x23        ; Data Segment Ring 3 (0x20 | 3)
+    mov ds, ax
+    mov es, ax
+    mov fs, ax
+    mov gs, ax
+    
+    mov eax, esp        ; Salva ESP 
+    
+    push 0x23           ; Stack Segment 
+    push eax            ; ESP3 
+    
+    pushf               ; EFLAGS
+    pop eax
+    or eax, 0x200       ; Set IF = 1 (Interrupts enabled)
+    push eax
+    
+    push 0x1B           ; Code Segment Ring 3 (0x18 | 3)
+    push ebx            ; EIP3 (ponteiro da func em User Mode)
+    
+    iretd

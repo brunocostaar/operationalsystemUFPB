@@ -33,6 +33,15 @@ void serial_write_hex(unsigned int value)
     }
 }
 
+extern void enter_user_mode(void (*func)());
+
+void user_function() {
+    char *video = (char*) 0x000B8000;
+    video[160] = 'U';
+    video[161] = 0x1F;
+    while(1);
+}
+
 /* * Função principal do Kernel.
  * O argumento 'ebx' contém a localização do mapa de memória do GRUB.
  */
@@ -121,17 +130,27 @@ void kmain(unsigned int ebx)
     /* ---------------- MULTIBOOT (Módulos) ---------------- */
     if (mbinfo->mods_count > 0)
     {
-        module_t *mod = (module_t*) mbinfo->mods_addr;
-        call_module_t start = (call_module_t)mod->mod_start;
-        start();
+        // module_t *mod = (module_t*) mbinfo->mods_addr;
+        // call_module_t start = (call_module_t)mod->mod_start;
+        serial_write("Modulo encontrado. Pulando execucao do modulo para testar Ring 3.\n");
+        // start(); // <<< Comentado para não prender a execução no jmp $ do program.s
     }
     else
     {
         serial_write("Nenhum modulo encontrado\n");
     }
 
-    // O Kernel dorme e aguarda interrupções
+    serial_write("Preparando salto para Ring 3 (User Mode)...\n");
+    
+    // Jump to User Mode
+
+    unsigned int tss_stack = (unsigned int) kmalloc(4096) + 4096;
+    extern void set_kernel_stack(unsigned int stack);
+    set_kernel_stack(tss_stack);
+
+    enter_user_mode(user_function);
+
+    // O Kernel nunca deveria chegar aqui se a transição funcionar.
     while (1)
         asm volatile("hlt");
 }
-

@@ -58,11 +58,11 @@ void paging_init(unsigned int ebx)
             unsigned int addr =
                 (t * 1024 + i) * PAGE_SIZE;
 
-            page_tables[t][i] = addr | 3; // present + rw
+            page_tables[t][i] = addr | 7; // present + rw + user
         }
 
         page_directory[t] =
-            ((unsigned int)page_tables[t]) | 3;
+            ((unsigned int)page_tables[t]) | 7;
     }
 
     /* -----------------------------
@@ -87,5 +87,5 @@ void map_page(unsigned int virt, unsigned int phys)
     unsigned int *table =
         (unsigned int*)(page_directory[dir] & 0xFFFFF000);
 
-    table[tbl] = phys | 3;
+    table[tbl] = phys | 7; // present + rw + user
 }

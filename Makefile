@@ -42,7 +42,7 @@ os.iso: kernel.elf program
                 iso
 
 run: program os.iso
-	qemu-system-i386 -cdrom os.iso -serial stdio
+	qemu-system-i386 -cdrom os.iso -serial stdio -d int -no-reboot > qemu.log 2>&1
 
 %.o: %.c
 	$(CC) $(CFLAGS) $< -o $@
