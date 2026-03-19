@@ -1,6 +1,6 @@
 .PHONY: all run clean
 
-OBJECTS = loader.o pmm.o kheap.o kmain.o io.o serial.o framebuffer.o gdt.o gdt_asm.o \
+OBJECTS = loader.o pmm.o kheap.o kmain.o io.o serial.o framebuffer.o gdt.o gdt_asm.o syscall.o\
           idt.o idt_asm.o pic.o interrupts.o interrupt_handlers.o paging.o paging_asm.o
 
 CC = gcc
@@ -11,6 +11,12 @@ CFLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
 LDFLAGS = -T link.ld -melf_i386
 AS = nasm
 ASFLAGS = -f elf32
+
+build_fs: build_fs.c
+	gcc build_fs.c -o build_fs
+
+fs.img: build_fs
+	./build_fs
 
 all: os.iso
 
@@ -24,10 +30,13 @@ program: program.s
 	mkdir -p iso/modules
 	nasm -f bin $< -o iso/modules/program
 
+filesystem: fs.img
+	mkdir -p iso/modules
+	cp fs.img iso/modules/fs.img
 # =========================
 # ISO
 # =========================
-os.iso: kernel.elf program
+os.iso: kernel.elf program filesystem
 	mkdir -p iso/boot/grub
 	cp kernel.elf iso/boot/kernel.elf
 	genisoimage -R                              \
@@ -51,5 +60,5 @@ run: program os.iso
 	$(AS) $(ASFLAGS) $< -o $@
 
 clean:
-	rm -rf *.o kernel.elf os.iso
+	rm -rf *.o kernel.elf os.iso build_fs fs.img
 	rm -rf iso/modules

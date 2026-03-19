@@ -78,3 +78,25 @@ enter_user_mode:
     push ebx            ; EIP3 (ponteiro da func em User Mode)
     
     iretd
+
+
+global syscall_handler_asm
+extern syscall_handler
+
+syscall_handler_asm:
+    cli
+
+    push dword 0        ; fake error code
+    push dword 128      ; interrupt number (0x80)
+
+    pushad
+
+    push esp
+    call syscall_handler
+    add esp, 4
+
+    popad
+    add esp, 8          ; remove interrupt_number + error_code
+
+    sti
+    iret

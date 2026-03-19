@@ -17,6 +17,18 @@ extern void kernel_physical_end(void);
 
 typedef void (*call_module_t)(void);
 
+#define MAX_FILES 16
+
+struct fs_file {
+    char name[32];
+    unsigned int size;
+    unsigned int offset;
+};
+
+struct fs_header {
+    unsigned int nfiles;
+    struct fs_file files[MAX_FILES];
+};
 /* Função auxiliar para imprimir números em hexadecimal na porta serial */
 void serial_write_hex(unsigned int value)
 {
@@ -36,9 +48,17 @@ void serial_write_hex(unsigned int value)
 extern void enter_user_mode(void (*func)());
 
 void user_function() {
-    char *video = (char*) 0x000B8000;
-    video[160] = 'U';
-    video[161] = 0x1F;
+    char *msg = "Hello from USER MODE via syscall!\n";
+
+    asm volatile(
+        "mov $0, %%eax\n"
+        "mov %0, %%ebx\n"
+        "int $0x80\n"
+        :
+        : "r"(msg)
+        : "eax", "ebx"
+    );
+
     while(1);
 }
 
@@ -51,7 +71,7 @@ void kmain(unsigned int ebx)
     unsigned int kp_start = (unsigned int)&kernel_physical_start;
     unsigned int kp_end   = (unsigned int)&kernel_physical_end;
     multiboot_info_t *mbinfo = (multiboot_info_t*) ebx;
-    /* ---------------- SERIAL E VÍDEO ---------------- */
+  /* ---------------- SERIAL E VÍDEO ---------------- */
     // Configura a porta serial COM1 para log de debug
     serial_configure_baud_rate(0x3F8, 3);
     serial_configure_buffers(SERIAL_COM1_BASE);
@@ -128,18 +148,45 @@ void kmain(unsigned int ebx)
     serial_write("Paging ativo\n");
 
     /* ---------------- MULTIBOOT (Módulos) ---------------- */
-    if (mbinfo->mods_count > 0)
+    /* ---------------- FILESYSTEM ---------------- */
+if (mbinfo->mods_count > 1)
+{
+    serial_write("\n[FS] Modulo de filesystem encontrado!\n");
+
+    module_t *mods = (module_t*) mbinfo->mods_addr;
+
+    unsigned int fs_addr = mods[1].mod_start;
+
+    serial_write("[FS] Endereco: ");
+    serial_write_hex(fs_addr);
+    serial_write("\n");
+
+    struct fs_header *fs = (struct fs_header*) fs_addr;
+
+    serial_write("[FS] Numero de arquivos: ");
+    serial_write_hex(fs->nfiles);
+    serial_write("\n");
+
+    // listar arquivos
+    for (unsigned int i = 0; i < fs->nfiles; i++)
     {
-        // module_t *mod = (module_t*) mbinfo->mods_addr;
-        // call_module_t start = (call_module_t)mod->mod_start;
-        serial_write("Modulo encontrado. Pulando execucao do modulo para testar Ring 3.\n");
-        // start(); // <<< Comentado para não prender a execução no jmp $ do program.s
-    }
-    else
-    {
-        serial_write("Nenhum modulo encontrado\n");
+        serial_write("[FS] Arquivo: ");
+        serial_write(fs->files[i].name);
+        serial_write("\n");
     }
 
+    // ler primeiro arquivo
+    struct fs_file *f = &fs->files[0];
+    char *data = (char*)(fs_addr + f->offset);
+
+    serial_write("[FS] Conteudo:\n");
+    serial_write(data);
+    serial_write("\n");
+}
+else
+{
+    serial_write("[FS] Nenhum filesystem encontrado\n");
+}
     serial_write("Preparando salto para Ring 3 (User Mode)...\n");
     
     // Jump to User Mode
