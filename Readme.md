@@ -172,7 +172,9 @@ Capítulo 11 - Modo Usuário (Segurança): Implementamos proteção de hardware.
 
 Capítulo 12 - Sistema de Arquivos: Criamos a capacidade do sistema de organizar dados e arquivos. Para evitar a extrema complexidade de criar drivers para um Disco Rígido (HD) físico nesta etapa, construímos um sistema de arquivos virtual que funciona inteiramente dentro da própria memória RAM.
 
-Heitor: Cap 10
+Separação do trabalho:
+
+Capítulo 10 (Heitor), Capítulo 11 (Bruno e Jorge), Capítulo 12 (Victória e Gabriel)
 
 # Gerenciamento de Memória (Capítulo 10)
 
