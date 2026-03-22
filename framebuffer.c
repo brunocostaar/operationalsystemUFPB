@@ -1,7 +1,7 @@
 #include "io.h"
 
 struct CoresCaractere *tela = (struct CoresCaractere *) 0xB8000;
-static unsigned int cursor_pos = 0;
+unsigned int cursor_pos = 0;
 
 void fb_write_cell(unsigned int posicao, char c, unsigned char cor_letra, unsigned char cor_fundo)
 {
@@ -54,4 +54,12 @@ int fb_write(char *buf)
     fb_move_cursor(cursor_pos);
     
     return i;
+}
+void fb_clear() {
+    for (int i = 0; i < 2000; i++) {
+        // Escreve espaços em branco na tela toda (cor azul do seu print)
+        fb_write_cell(i, ' ', FB_WHITE, FB_BLUE);
+    }
+    cursor_pos = 0;
+    fb_move_cursor(0);
 }

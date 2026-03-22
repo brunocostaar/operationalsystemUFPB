@@ -1,7 +1,7 @@
 .PHONY: all run clean
 
 OBJECTS = loader.o pmm.o kheap.o kmain.o io.o serial.o framebuffer.o gdt.o gdt_asm.o syscall.o\
-          idt.o idt_asm.o pic.o interrupts.o interrupt_handlers.o paging.o paging_asm.o
+          idt.o idt_asm.o pic.o interrupts.o interrupt_handlers.o paging.o paging_asm.o ramfs.o shell.o
 
 CC = gcc
 CFLAGS = -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector \

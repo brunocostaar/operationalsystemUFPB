@@ -5,6 +5,8 @@
 #include "multiboot.h"
 #include "pmm.h"
 #include "kheap.h"
+#include "ramfs.h"
+#include "shell.h"
 
 /* * Importando as marcações de memória do link.ld.
  * Declaramos como funções void para forçar o compilador a nos dar 
@@ -14,6 +16,8 @@ extern void kernel_virtual_start(void);
 extern void kernel_virtual_end(void);
 extern void kernel_physical_start(void);
 extern void kernel_physical_end(void);
+extern void fb_clear();
+extern unsigned int cursor_pos;
 
 typedef void (*call_module_t)(void);
 
@@ -67,6 +71,7 @@ void user_function() {
  */
 void kmain(unsigned int ebx)
 {
+    fb_clear();
     // Lendo as coordenadas exatas do nosso Kernel na memória usando '&'
     unsigned int kp_start = (unsigned int)&kernel_physical_start;
     unsigned int kp_end   = (unsigned int)&kernel_physical_end;
@@ -147,6 +152,19 @@ void kmain(unsigned int ebx)
     paging_init(ebx);
     serial_write("Paging ativo\n");
 
+    // --- TESTE DO PONTO 1 ---
+    init_fs();
+
+    /* ---------------- TERMINAL (PONTO 3) ---------------- */
+    // 1. Desliga o "guarda de trânsito" para ele não roubar as teclas!
+    asm volatile("cli");
+
+    // 2. Removi os fb_write soltos daqui porque o run_shell já faz isso.
+
+    // 3. Entra no loop do terminal
+    run_shell();
+
+    /* ---------------- MULTIBOOT (Módulos) ---------------- */
     /* ---------------- MULTIBOOT (Módulos) ---------------- */
     /* ---------------- FILESYSTEM ---------------- */
 if (mbinfo->mods_count > 1)
