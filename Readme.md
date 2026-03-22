@@ -159,3 +159,43 @@ Para apagar os arquivos compilados (`.o`, `.elf`, `.iso`) e limpar a pasta:
 make clean
 
 **Funcionalidades neste ponto:** Inicialização Padronizada (Multiboot), Comunicação Visual (Framebuffer), Canal de Depuração (Serial), Privilégio e Segmentação (GDT), Recepção de Eventos (IDT e PIC), Memória Virtual (Paginação).
+
+Capítulos 10, 11, 12 do livro "The little book about OS development"
+
+Resumo das Implementações (Cap. 10, 11 e 12)
+
+Capítulo 10 - Memória Dinâmica: O sistema deixou de usar endereços de memória fixos e passou a gerenciar a RAM da máquina sob demanda. Criamos funções que fatiam a memória física e alocam blocos exatos conforme a necessidade, evitando desperdício.
+
+
+Capítulo 11 - Modo Usuário (Segurança): Implementamos proteção de hardware. O sistema agora reduz os privilégios da CPU para rodar programas externos em um ambiente restrito, garantindo que um aplicativo comum não consiga acessar ou travar o núcleo do Sistema Operacional (Kernel).
+
+
+Capítulo 12 - Sistema de Arquivos: Criamos a capacidade do sistema de organizar dados e arquivos. Para evitar a extrema complexidade de criar drivers para um Disco Rígido (HD) físico nesta etapa, construímos um sistema de arquivos virtual que funciona inteiramente dentro da própria memória RAM.
+
+Heitor: Cap 10
+
+# Gerenciamento de Memória (Capítulo 10)
+
+Este diretório contém a implementação do subsistema de memória do Sistema Operacional, abrangendo desde o mapeamento físico do hardware até a alocação dinâmica
+## 1. Gerenciador de Memória Física (PMM)
+O PMM (Physical Memory Manager) atua na camada mais baixa do sistema, comunicando-se com o mapa de hardware fornecido pelo GRUB via Multiboot.
+
+* **Mapeamento via Bitmap:** A memória física foi dividida em blocos (frames) de 4 KB. Utilizamos uma estrutura de Bitmap onde cada bit representa o estado de um frame (0 para livre, 1 para ocupado).
+* **Proteção do Kernel:** O sistema lê os endereços `kernel_physical_start` e `kernel_physical_end` gerados pelo linker script para isolar a área onde o Kernel foi carregado, prevenindo sobrescritas acidentais.
+* **Alocação Bruta:** Fornecimento das primitivas `pmm_alloc_page()` e `pmm_free_page()` para manipulação de blocos absolutos de 4 KB.
+
+## 2. Kernel Heap (Alocação Dinâmica)
+Como o PMM gerencia a memória de forma granular (4 KB), construímos um gerenciador de Heap para permitir a alocação de estruturas menores no Kernel.
+
+* **kmalloc e fatiamento:** O sistema solicita páginas ao PMM e as subdivide dinamicamente.
+* **Hidden Headers:** Para controle de estado, cada bloco de memória alocado recebe um cabeçalho estrutural em C posicionado antes do ponteiro retornado. Esse cabeçalho armazena o tamanho exato da alocação e a flag de uso.
+* **kfree:** Implementação da liberação de memória através da leitura do offset do cabeçalho oculto, evitando *memory leaks*.
+
+<p align="center">
+  <img src="print3.png" alt="Logs Do SO provando paginação" width="600">
+  <br>
+  <em>Logs Do SO provando a paginação.</em>
+</p> 
+
+
+
