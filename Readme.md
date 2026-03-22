@@ -159,3 +159,66 @@ Para apagar os arquivos compilados (`.o`, `.elf`, `.iso`) e limpar a pasta:
 make clean
 
 **Funcionalidades neste ponto:** Inicialização Padronizada (Multiboot), Comunicação Visual (Framebuffer), Canal de Depuração (Serial), Privilégio e Segmentação (GDT), Recepção de Eventos (IDT e PIC), Memória Virtual (Paginação).
+
+
+
+## Capítulo 12: File System
+
+**Responsável:** Gabriel
+
+Neste capítulo, foi implementado um sistema de arquivos simples do tipo **Read-Only File System**, carregado pelo GRUB como um módulo do Multiboot. O objetivo foi permitir que o kernel tenha acesso a arquivos externos sem que eles estejam compilados diretamente no kernel, criando uma abstração inicial de sistema de arquivos.
+
+### Estratégia utilizada
+
+O sistema de arquivos foi implementado como uma imagem (`fs.img`) contendo:
+
+- Um cabeçalho (header) com metadados dos arquivos  
+- Uma tabela de arquivos  
+- Os dados dos arquivos  
+
+Toda a imagem é carregada pelo GRUB como um módulo e fica disponível na memória RAM, permitindo que o kernel leia os arquivos diretamente da memória.
+
+A imagem do filesystem é gerada automaticamente durante o processo de build através do programa `build_fs.c`, que cria o arquivo `fs.img`. O Makefile compila esse programa, gera a imagem e a copia para a pasta `iso/modules`, para que o GRUB carregue o filesystem junto com o kernel.
+
+### Como verificar se o filesystem foi criado
+
+Para verificar se a imagem do filesystem foi gerada corretamente, podem ser utilizados os seguintes comandos:
+
+**Verificar se o arquivo foi criado:**
+```bash
+ls fs.img
+```
+
+**Verificar se o arquivo foi para a ISO:**
+```bash
+ls iso/modules
+```
+
+Deve aparecer:
+```text
+program
+fs.img
+```
+
+**Verificar o conteúdo da imagem:**
+```bash
+strings fs.img
+```
+
+Deve aparecer:
+```text
+hello.txt
+Hello from FS!
+```
+
+Ao executar o sistema com `make run`, o kernel deve detectar o módulo e imprimir no terminal serial o nome do arquivo e seu conteúdo, confirmando que o filesystem foi carregado corretamente na memória.
+
+### Saída esperada no terminal serial
+
+```text
+[FS] Modulo de filesystem encontrado!
+[FS] Numero de arquivos: 1
+[FS] Arquivo: hello.txt
+[FS] Conteudo:
+Hello from FS!
+```
