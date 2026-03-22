@@ -273,3 +273,24 @@ Ao executar o sistema com `make run`, o kernel deve detectar o módulo e imprimi
 [FS] Conteudo:
 Hello from FS!
 ```
+
+## ATIVIDADE EXTRA 4: Implementação do Sistema de Arquivos na Memória Principal (RAMFS)
+
+Responsável: Victória
+
+Nesta etapa, foi desevolvido um sistema de arquivos temporário (RAMFS) que funciona diretamente na memória principal do SO, integrado a um terminal interativo para que o usuário possa gerenciar os dados.
+
+**O que foi desenvolvido:**
+
+* **Terminal Interativo (Shell):** Criamos um shell (com o prompt `vic@OS:/$`) que lê os comandos digitados pelo usuário no teclado. Ele entende o comando principal e "fatia" o texto para identificar os argumentos (como o nome de uma pasta, por exemplo). O terminal também conta com a função de Backspace funcional e comandos utilitários como o `clear` (para limpar a tela) e o `help`.
+
+<p align="center">
+  <img src="printterminal.png" alt="Terminal em funcionamento" width="600">
+  <br>
+  <em>Comandos de terminal em funcionamento pleno.</em>
+</p> 
+* **Navegação e Gerenciamento de Diretórios:**
+  O terminal foi conectado ao nosso RAMFS, permitindo a execução dos seguintes comandos em tempo real:
+  * `ls`: Lê a memória e lista todos os diretórios que estão salvos na raiz do sistema.
+  * `mkdir [nome]`: Aloca espaço na memória principal e cria um novo diretório com o nome especificado (ex: `mkdir UFPB`).
+  * `rmdir [nome]`: Busca o diretório na memória e o remove do sistema de arquivos.
