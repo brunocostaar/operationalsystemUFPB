@@ -289,7 +289,9 @@ Nesta etapa, foi desevolvido um sistema de arquivos temporário (RAMFS) que func
   <br>
   <em>Comandos de terminal em funcionamento pleno.</em>
 </p> 
-* **Navegação e Gerenciamento de Diretórios:** O terminal foi conectado ao nosso RAMFS, permitindo a execução dos seguintes comandos em tempo real: 
+**Navegação e Gerenciamento de Diretórios:**
+
+O terminal foi conectado ao nosso RAMFS, permitindo a execução dos seguintes comandos em tempo real: 
 
 * **`ls`**: Lê a memória e lista todos os diretórios que estão salvos na raiz do sistema. 
 * **`mkdir [nome]`**: Aloca espaço na memória principal e cria um novo diretório com o nome especificado (ex: `mkdir UFPB`). 
