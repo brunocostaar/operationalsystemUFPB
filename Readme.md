@@ -176,7 +176,7 @@ Separação do trabalho:
 
 Capítulo 10 (Heitor), Capítulo 11 (Bruno e Jorge), Capítulo 12 (Victória e Gabriel)
 
-# Gerenciamento de Memória (Capítulo 10)
+# ATIVIDADE EXTRA 3: Gerenciamento de Memória (Capítulo 10)
 
 Este diretório contém a implementação do subsistema de memória do Sistema Operacional, abrangendo desde o mapeamento físico do hardware até a alocação dinâmica
 ## 1. Gerenciador de Memória Física (PMM)
