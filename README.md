@@ -311,11 +311,11 @@ O terminal foi conectado ao nosso RAMFS, permitindo a execução dos seguintes c
 <div align="center">
   <h3> Group3OS: Operações de Kernel e RamFS </h3>
   
-  <video src="gravacaoSO.webm" width="100%" controls title="Demonstração do Sistema Operacional">
+  <video src="./gravacaoSO.mp4" width="100%" controls>
     Seu navegador não suporta a exibição de vídeos.
   </video>
 
-  <p align="center">
+  <p>
     <i>Group3@Group3OS:~/$ Executando demonstração de leitura e escrita em RAM...</i>
   </p>
 </div>
