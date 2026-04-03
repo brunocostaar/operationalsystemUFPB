@@ -311,7 +311,7 @@ O terminal foi conectado ao nosso RAMFS, permitindo a execução dos seguintes c
 <div align="center">
   <h3> Group3OS: Operações de Kernel e RamFS </h3>
   
-  <video src="./[gravacaoSO.webm"](https://github.com/user-attachments/assets/4d143f0e-2547-4e01-a75d-2b338b1b791c) width="100%" controls>
+  <video src="https://github.com/user-attachments/assets/4d143f0e-2547-4e01-a75d-2b338b1b791c" width="100%" controls>
     Seu navegador não suporta a exibição de vídeos.
   </video>
 
