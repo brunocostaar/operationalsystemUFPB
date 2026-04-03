@@ -11,6 +11,8 @@ typedef struct FileNode {
     struct FileNode* parent; // Ponteiro para a pasta "mãe"
     struct FileNode* children[MAX_CHILDREN]; // O que tem dentro dessa pasta
     int child_count; // Quantidade atual de itens
+    char* data; 
+    int size;
 } FileNode;
 
 // Variáveis globais para controlar onde estamos na navegação
