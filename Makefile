@@ -1,5 +1,7 @@
 .PHONY: all run clean
 
+all: os.iso
+
 OBJECTS = loader.o pmm.o kheap.o kmain.o io.o serial.o framebuffer.o gdt.o gdt_asm.o syscall.o\
           idt.o idt_asm.o pic.o interrupts.o interrupt_handlers.o paging.o paging_asm.o ramfs.o shell.o
 
@@ -18,8 +20,6 @@ build_fs: build_fs.c
 fs.img: build_fs
 	./build_fs
 
-all: os.iso
-
 kernel.elf: $(OBJECTS)
 	ld $(LDFLAGS) $(OBJECTS) -o kernel.elf
 
@@ -33,6 +33,7 @@ program: program.s
 filesystem: fs.img
 	mkdir -p iso/modules
 	cp fs.img iso/modules/fs.img
+
 # =========================
 # ISO
 # =========================

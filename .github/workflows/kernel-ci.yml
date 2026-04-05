@@ -39,7 +39,9 @@ jobs:
           grub-mkrescue --version || true
 
       - name: Compilar kernel e ISO
-        run: make clean && make
+        run: |
+          make clean
+          make all
 
       - name: Listar arquivos gerados
         run: |
