@@ -2,7 +2,7 @@ name: Kernel CI
 
 on:
   push:
-    branches: [ "main", "master" ]
+    branches: ["ci", "main", "master" ]
   pull_request:
   workflow_dispatch:
 
