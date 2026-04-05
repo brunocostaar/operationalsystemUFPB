@@ -1,0 +1,62 @@
+name: Kernel CI
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Baixar repositório
+        uses: actions/checkout@v4
+
+      - name: Instalar dependências
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            build-essential \
+            gcc-multilib \
+            g++-multilib \
+            binutils \
+            nasm \
+            genisoimage \
+            qemu-system-x86 \
+            grub-pc-bin \
+            grub-common \
+            mtools \
+            xorriso
+
+      - name: Verificar ferramentas
+        run: |
+          gcc --version
+          ld --version
+          nasm -v
+          qemu-system-i386 --version
+          grub-mkrescue --version || true
+
+      - name: Compilar kernel e ISO
+        run: make clean && make
+
+      - name: Listar arquivos gerados
+        run: |
+          find . -maxdepth 3 -type f | sort
+
+      - name: Testar boot básico
+        run: |
+          timeout 15s qemu-system-i386 -cdrom os.iso -serial stdio -display none || true
+
+      - name: Salvar artefatos
+        uses: actions/upload-artifact@v4
+        with:
+          name: kernel-build
+          path: |
+            kernel.elf
+            os.iso
+            fs.img
+            qemu.log
+            iso/modules/program
+          if-no-files-found: warn
